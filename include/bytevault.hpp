@@ -4,6 +4,8 @@
 #include <map>
 #include <string>
 #include <malloc.h>
+#include <fstream>
+#include <memory.h>
 
 namespace bytevault {
 
