@@ -1,9 +1,25 @@
 #include <bytevault.hpp>
+#include <iostream>
 
 namespace bytevault{
     /* Data-related stuff */
-    __db_data::~__db_data() {
+
+    void __db_data::destroy() {
         free(data_ptr);
+    }
+
+    /* Database class related stuff */
+
+    db::db(__db_header h, __db_data d) {
+        header = h;
+        data = d;
+    }
+
+    void db::print_header() {
+        for (auto &&k : header){
+            std::cout << k.first << " : " << k.second << '\n';
+        }
+        
     }
 
     /* Some functions */
@@ -15,19 +31,18 @@ namespace bytevault{
             /* Throw an exception */
         }
 
-        file.seekg(0, std::ios::end);
+        file.seekg(0, std::ifstream::end);
         std::streampos file_size = file.tellg();
         file.seekg(0, std::ios::beg);
 
-        u_char buff[file_size];
+        u_char buff[(int)file_size];
 
         file.read(reinterpret_cast<char*>(buff), file_size);
 
         // 2. Get the header binary
         int pos = 4;
-        int header_size;
+        int header_size = 0;
         memcpy(&header_size, &buff, 4);
-
         void* header_bin = malloc(header_size);
         memcpy(header_bin, buff+4, header_size);
 
@@ -58,8 +73,16 @@ namespace bytevault{
             int key_index;
             memcpy(&key_index, static_cast<u_char*>(header_bin) + i, 4);
             i += 4;
-
             header_map[std::string(key_name)] = key_index;
         }
+
+        //5. Build the db class
+        __db_data data;
+            data.data_ptr = data_bin;
+            data.data_size = data_size;
+        
+        db database(header_map, data);
+        file.close();
+        return database;
     }
 }

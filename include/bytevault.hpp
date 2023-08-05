@@ -6,47 +6,53 @@
 #include <malloc.h>
 #include <fstream>
 #include <memory.h>
+#include <vector>
 
 namespace bytevault {
 
-    typedef std::map<std::string, int> __db_header;
+    extern "C" {
 
-    // Indicates type of the key
-    enum key_type {
-        BIN, LIST, MAP
-    };
+        typedef std::map<std::string, int> __db_header;
 
-    // Contains information about the key
-    struct db_key {
-        int size;
-        void* value;
-    };
-    
-    // Contains data of the database
-    class __db_data {
-    public:
-        int data_size;
-        void* data_ptr;
+        // Indicates type of the key
+        enum key_type {
+            BIN, LIST, MAP
+        };
 
-        ~__db_data();
-    };
+        // Contains information about the key
+        struct db_key {
+            int size;
+            void* value;
+        };
+        
+        // Contains data of the database
+        class __db_data {
+        public:
+            int data_size;
+            void* data_ptr;
 
-    // Main database class
-    class db {
-    private:
-        __db_header header;
-        __db_data data;
-    public:
-        db(__db_header h, __db_data d);
+            void destroy();
+        };
 
-        void set_key(std::string name, db_key value);
-        db_key get_key(std::string name);
+        // Main database class
+        class db {
+        private:
+            __db_header header;
+            __db_data data;
+        public:
+            db(__db_header h, __db_data d);
 
-        void to_file(std::string path);        
-    };
+            void set_key(std::string name, db_key value);
+            db_key get_key(std::string name);
 
-    // Loads database from a file
-    db from_file(std::string path);
+            void to_file(std::string path);
+
+            /* Debug-related stuff */
+            void print_header();       
+        };
+
+        // Loads database from a file
+        db from_file(std::string path);
+    }
 }
-
 #endif
