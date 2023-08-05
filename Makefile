@@ -1,6 +1,6 @@
-CC = gcc
+CXX = g++
 
-CFLAGS = -Iinclude -Ofast
+CXXFLAGS = -Iinclude -Ofast
 
 SRC_DIR = src
 OBJ_DIR = obj
@@ -13,4 +13,4 @@ SOURCES = $(wildcard $(SRC_DIR)/*.c)
 all: $(TARGET)
 
 $(TARGET):
-	$(CC) src/bytevault.c $(CFLAGS) -shared -fPIC -o obj/bytevault.so
+	$(CXX) src/bytevault.cpp $(CXXFLAGS) -shared -fPIC -o obj/bytevault.so
