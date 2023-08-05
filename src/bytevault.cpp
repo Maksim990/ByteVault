@@ -44,19 +44,19 @@ namespace bytevault{
         for (int i = 0; i < header_size; i++) {
             int key_length;
 
-            // REad the length of the key (4 bytes)
-            memcpy($key_length, static_cast<u_char*>(header_bin) + i, 4);
+            // Read the length of the key (4 bytes)
+            memcpy(&key_length, static_cast<u_char*>(header_bin) + i, 4);
             i += 4;
 
-            //  read the key name
+            // Read the key name
             char key_name[key_length + 1];
-            memcpy(key_name, statuc_cast<u_char*>(header_bin) + index, key_length);
-            key_name[key_length] = "\0"; // null-terminate the string
+            memcpy(key_name, static_cast<u_char*>(header_bin) + i, key_length);
+            key_name[key_length] = 0; // null-terminate the string
             i += key_length;
 
-            // кead the index of the key (4 bytes)
+            // Read the index of the key (4 bytes)
             int key_index;
-            memcpy($key_index, static_cast<u_char*>(header_bin) + i, 4);
+            memcpy(&key_index, static_cast<u_char*>(header_bin) + i, 4);
             i += 4;
 
             header_map[std::string(key_name)] = key_index;
