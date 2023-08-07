@@ -19,7 +19,31 @@ namespace bytevault {
         for (auto &&k : header){
             std::cout << k.first << " : " << k.second << '\n';
         }
-        
+    }
+
+    db_key db::get_key(std::string name) {
+        auto it = header.find(name);
+        if (it == header.end()) {
+            // key not found, return a default db_key
+            return db_key{BIN, 0, nullptr};
+        }
+
+        int key_index = it->second;
+        u_char* key_data_ptr = static_cast<u_char*>(data.data_ptr) + key_index;
+
+        // Read the key type (4 bytes)
+        key_type type = read_key_type(key_data_ptr);
+        key_data_ptr += sizeof(int);
+
+        // Read the key size (4 bytes)
+        int key_size = read_int_from_buffer(key_data_ptr);
+        key_data_ptr += sizeof(int);
+
+        // Read the key value data
+        void* key_value = read_key_data(key_data_ptr, key_size);
+
+        // Create and return the db_key
+        return db_key{type, key_size, key_value};
     }
 
     /* Some functions */
@@ -86,50 +110,21 @@ namespace bytevault {
         return database;
     }
 
-    // function to read an integer from a byte array
     int read_int_from_buffer(const u_char* buffer) {
         int value;
         memcpy(&value, buffer, sizeof(int));
         return value;
     }
 
-    // function to read the key type from a byte array
     key_type read_key_type(const u_char* buffer) {
         int type;
-        memcpy($type, buffer, sizeof(int));
+        memcpy(&type, buffer, sizeof(int));
         return static_cast<key_type>(type);
     }
 
-    // function to read the key data from a byte array
     void* read_key_data(const u_char* buffer, int size) {
         void* data = malloc(size);
         memcpy(data, buffer, size);
         return data;
-    }
-
-    // function to retrieve a key from the database by name
-    db_key db::get_key(std::string name) {
-        auto it = header.find(name);
-        if (it == header.end()) {
-            // key not found, return a default db_key
-            return db_key{BIN, 0, nullptr};
-        }
-
-        int key_index = it->second;
-        u_char* key_data_ptr = static_cast<u_char*>(data.data_ptr) + key_index;
-
-        // Read the key type (4 bytes)
-        key_type type = read_key_type(key_data_ptr);
-        key_data_ptr += sizeof(int);
-
-        // Read the key size (4 bytes)
-        int key_size = read_int_from_buffer(key_data_ptr);
-        key_data_ptr += sizeof(int);
-
-        // Read the key value data
-        void* key_value = read_key_data(key_data_ptr, key_size);
-
-        // Create and return the db_key
-        return db_key{type, key_size, key_value};
     }
 }
