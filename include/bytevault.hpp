@@ -21,6 +21,7 @@ namespace bytevault {
 
         // Contains information about the key
         struct db_key {
+            key_type type;
             int size;
             void* value;
         };
